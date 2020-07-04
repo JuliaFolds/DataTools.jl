@@ -4,16 +4,16 @@
 [![GitHub Actions](https://github.com/JuliaFolds/DataTools.jl/workflows/Run%20tests/badge.svg)](https://github.com/JuliaFolds/DataTools.jl/actions?query=workflow%3A%22Run+tests%22)
 
 ```julia
-julia> using DataTools: oncol, modifying
+julia> using DataTools: oncol, modifying, averaging
 
 julia> using Transducers: Filter
 
 julia> data = [(a = 1, b = 7), (a = 2, b = 3), (a = 3, b = 4)];
 
-julia> rf = oncol(a = +, b = *);
+julia> rf = oncol(a = +, b = averaging);
 
 julia> foldl(rf, Filter(x -> isodd(x.a)), data)
-(a = 4, b = 28)
+(a = 4, b = 5.5)
 
 julia> map(modifying(a = string), data)
 3-element Array{NamedTuple{(:a, :b),Tuple{String,Int64}},1}:
