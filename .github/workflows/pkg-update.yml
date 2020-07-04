@@ -70,7 +70,7 @@ jobs:
         uses: tkf/julia-update-manifests@v1
         with:
           version: '1.4'
-          projects: test/environments/main
+          projects: test/environments/main docs
 
       - run: git status
       - run: git diff
