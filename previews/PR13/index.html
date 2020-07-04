@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · DataTools.jl</title><link rel="canonical" href="https://JuliaFolds.github.io/DataTools.jl/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">DataTools.jl</span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaFolds/DataTools.jl/blob/master/docs/src/index.md#L" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="DataTools"><a class="docs-heading-anchor" href="#DataTools">DataTools</a><a id="DataTools-1"></a><a class="docs-heading-anchor-permalink" href="#DataTools" title="Permalink"></a></h1><ul><li><a href="#DataTools.DataTools"><code>DataTools.DataTools</code></a></li><li><a href="#DataTools.averaging"><code>DataTools.averaging</code></a></li><li><a href="#DataTools.inc1-Tuple{Any,Any}"><code>DataTools.inc1</code></a></li><li><a href="#DataTools.modifying"><code>DataTools.modifying</code></a></li><li><a href="#DataTools.oncol"><code>DataTools.oncol</code></a></li></ul><article class="docstring"><header><a class="docstring-binding" id="DataTools.DataTools" href="#DataTools.DataTools"><code>DataTools.DataTools</code></a> — <span class="docstring-category">Module</span></header><section><div><p><strong>DataTools: manipulating flat tables and nested data structures using Transducers.jl</strong></p><p><a href="https://juliafolds.github.io/DataTools.jl/dev"><img src="https://img.shields.io/badge/docs-dev-blue.svg" alt="Dev"/></a> <a href="https://github.com/JuliaFolds/DataTools.jl/actions?query=workflow%3A%22Run+tests%22"><img src="https://github.com/JuliaFolds/DataTools.jl/workflows/Run%20tests/badge.svg" alt="GitHub Actions"/></a></p><pre><code class="language-julia-repl">julia&gt; using DataTools: oncol, modifying, averaging
+
+julia&gt; using Transducers: Filter
+
+julia&gt; data = [(a = 1, b = 7), (a = 2, b = 3), (a = 3, b = 4)];
+
+julia&gt; rf = oncol(a = +, b = averaging);
+
+julia&gt; foldl(rf, Filter(x -&gt; isodd(x.a)), data)
+(a = 4, b = 5.5)
+
+julia&gt; map(modifying(a = string), data)
+3-element Array{NamedTuple{(:a, :b),Tuple{String,Int64}},1}:
+ (a = &quot;1&quot;, b = 7)
+ (a = &quot;2&quot;, b = 3)
+ (a = &quot;3&quot;, b = 4)
+
+julia&gt; reduce(modifying(a = +), data)
+(a = 6, b = 7)
+
+julia&gt; using Setfield: @lens
+
+julia&gt; data = [(a = ((b = 1,), 2),), (a = ((b = 3,), 4),)];
+
+julia&gt; map(modifying(@lens(_.a[1].b) =&gt; x -&gt; 10x), data)
+2-element Array{NamedTuple{(:a,),Tuple{Tuple{NamedTuple{(:b,),Tuple{Int64}},Int64}}},1}:
+ (a = ((b = 10,), 2),)
+ (a = ((b = 30,), 4),)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaFolds/DataTools.jl/blob/8f209fcb415535fb37d3e2b4d5de8564de47d812/src/DataTools.jl#LL16-L52">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="DataTools.averaging" href="#DataTools.averaging"><code>DataTools.averaging</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">averaging</code></pre><p>A reducing function for averaging elements.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using DataTools
+       using Transducers
+
+julia&gt; foldl(averaging, Filter(isodd), 1:10)
+5.0
+
+julia&gt; rf = oncol(a = averaging, b = averaging);
+
+julia&gt; foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
+(a = 1.5, b = 2.5)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaFolds/DataTools.jl/blob/8f209fcb415535fb37d3e2b4d5de8564de47d812/src/reductions.jl#LL36-L54">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="DataTools.inc1-Tuple{Any,Any}" href="#DataTools.inc1-Tuple{Any,Any}"><code>DataTools.inc1</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">inc1(n, _) -&gt; n + 1</code></pre><p>A reducing function for counting elements.  It increments the first argument by one.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using DataTools
+       using Transducers
+
+julia&gt; inc1(10, :ignored)
+11
+
+julia&gt; inc1(Init(inc1), :ignored)
+1
+
+julia&gt; foldl(inc1, Map(identity), &#39;a&#39;:2:&#39;e&#39;)
+3
+
+julia&gt; foldl(TeeRF(+, inc1), Map(identity), 1:2:10)  # sum and count
+(25, 5)
+
+julia&gt; rf = oncol(:a =&gt; (+) =&gt; :sum, :a =&gt; inc1 =&gt; :count);
+
+julia&gt; foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
+(sum = 3, count = 2)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaFolds/DataTools.jl/blob/8f209fcb415535fb37d3e2b4d5de8564de47d812/src/reductions.jl#LL1-L29">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="DataTools.modifying" href="#DataTools.modifying"><code>DataTools.modifying</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">modifying(; $property₁ = f₁, ..., $propertyₙ = fₙ) -&gt; g::Function
+modifying(lens₁ =&gt; f₁, ..., lensₙ =&gt; fₙ) -&gt; g::Function</code></pre><p>Create a function that runs function <code>fᵢ</code> on the locations specified by <code>propertyᵢ</code> or <code>lensᵢ</code>.</p><p>The keyword-only method <code>modifying(; a = f₁, b = f₂)</code> is equivalent to <code>modifying(@len(_.a) =&gt; f₁, @len(_.b) =&gt; f₂)</code>.</p><p>The unary method <code>g(x)</code> is equivalent to</p><pre><code class="language-julia">x = modify(f₁, x, lens₁)
+x = modify(f₂, x, lens₂)
+...
+x = modify(fₙ, x, lensₙ)</code></pre><p>The binary method <code>g(x, y)</code> is equivalent to</p><pre><code class="language-julia">x = set(x, lens₁, f₁(get(x, lens₁), get(y, lens₁)))
+x = set(x, lens₂, f₂(get(x, lens₂), get(y, lens₂)))
+...
+x = set(x, lensₙ, fₙ(get(x, lensₙ), get(y, lensₙ)))</code></pre><p>Note that the locations that are not specified by the lenses keep the values as in <code>x</code>.  This is similar to how <code>mergewith</code> behaves.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using DataTools
+
+julia&gt; map(modifying(a = string), [(a = 1, b = 2), (a = 3, b = 4)])
+2-element Array{NamedTuple{(:a, :b),Tuple{String,Int64}},1}:
+ (a = &quot;1&quot;, b = 2)
+ (a = &quot;3&quot;, b = 4)
+
+julia&gt; reduce(modifying(a = +), [(a = 1, b = 2), (a = 3, b = 4)])
+(a = 4, b = 2)
+
+julia&gt; using Setfield
+
+julia&gt; map(modifying(@lens(_.a[1].b) =&gt; x -&gt; 10x),
+           [(a = ((b = 1,), 2),), (a = ((b = 3,), 4),)])
+2-element Array{NamedTuple{(:a,),Tuple{Tuple{NamedTuple{(:b,),Tuple{Int64}},Int64}}},1}:
+ (a = ((b = 10,), 2),)
+ (a = ((b = 30,), 4),)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaFolds/DataTools.jl/blob/8f209fcb415535fb37d3e2b4d5de8564de47d812/src/modifying.jl#LL1-L52">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="DataTools.oncol" href="#DataTools.oncol"><code>DataTools.oncol</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">oncol(iname₁ =&gt; spec₁, ..., inameₙ =&gt; specₙ) -&gt; f::Function
+oncol(; $iname₁ = spec₁, ..., $inameₙ = specₙ) -&gt; f::Function</code></pre><p>Combine functions that work on a column and create a function that work on an entire row.</p><p>It constructs a reducing step function acting on a table row where <code>specᵢ</code> is either a reducing step function or a <code>Pair</code> of a reducing step function and an output column name.</p><p>It also defines a unary function when <code>specᵢ</code> is either a unary function or a <code>Pair</code> of a unary function and an output column name.</p><p>This function is inspired by the &quot;<code>Pair</code> notation&quot; in DataFrames.jl (see also <a href="https://juliadata.github.io/DataFrames.jl/stable/man/split_apply_combine/">Split-apply-combine · DataFrames.jl</a> and <a href="https://juliadata.github.io/DataFrames.jl/stable/lib/functions/#DataFrames.select"><code>DataFrames.select</code></a>).</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; using DataTools
+       using Transducers
+
+julia&gt; rf = oncol(a = +, b = *);
+
+julia&gt; foldl(rf, Map(identity), [(a = 1, b = 2), (a = 3, b = 4)])
+(a = 4, b = 8)
+
+julia&gt; rf((a = 1, b = 2), (a = 3, b = 4))
+(a = 4, b = 8)
+
+julia&gt; rf = oncol(:a =&gt; (+) =&gt; :sum, :a =&gt; max =&gt; :max);
+
+julia&gt; foldl(rf, Map(identity), [(a = 1,), (a = 2,)])
+(sum = 3, max = 2)
+
+julia&gt; rf((sum = 1, max = 1), (a = 2,))
+(sum = 3, max = 2)
+
+julia&gt; rf = oncol(:a =&gt; min, :a =&gt; max);
+
+julia&gt; foldl(rf, Map(identity), [(a = 2,), (a = 1,)])
+(a_min = 1, a_max = 2)
+
+julia&gt; rf((a_min = 2, a_max = 2), (a = 1,))
+(a_min = 1, a_max = 2)
+
+julia&gt; foldl(rf, Map(x -&gt; (a = x,)), [5, 2, 6, 8, 3])
+(a_min = 2, a_max = 8)</code></pre><p><code>oncol</code> also defines a unary function</p><pre><code class="language-julia-repl">julia&gt; f = oncol(a = string);
+
+julia&gt; f((a = 1, b = 2))
+(a = &quot;1&quot;,)</code></pre><p>Note that <code>oncol</code> does not verify the arity of input functions.  If the input functions have unary and binary methods, <code>oncol</code> is callable with both arities:</p><pre><code class="language-julia-repl">julia&gt; f((a = 1, b = 2), (a = 3, b = 4))
+(a = &quot;13&quot;,)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaFolds/DataTools.jl/blob/8f209fcb415535fb37d3e2b4d5de8564de47d812/src/oncol.jl#LL5-L75">source</a></section></article></article></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 4 July 2020 03:49">Saturday 4 July 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
