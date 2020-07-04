@@ -18,4 +18,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/JuliaFolds/DataTools.jl",
+    push_preview = true,
 )
