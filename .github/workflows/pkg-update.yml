@@ -62,12 +62,18 @@ jobs:
           git ls-tree -r --name-only "origin/$base" | grep -F Manifest.toml \
               | xargs git add -f --
 
+      - run: git status
+      - run: git diff --cached
+
       # https://github.com/tkf/julia-update-manifests
       - name: Update */Manifest.toml
         uses: tkf/julia-update-manifests@v1
         with:
           version: '1.4'
           projects: test/environments/main
+
+      - run: git status
+      - run: git diff
 
       # https://github.com/peter-evans/create-pull-request
       # https://github.com/marketplace/actions/create-pull-request
