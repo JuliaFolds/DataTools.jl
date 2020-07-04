@@ -52,9 +52,20 @@ julia> foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
 (a = 1.5, b = 2.5)
 ```
 """
-function averaging end
-@inline averaging((n, s), x) = (n + 1, s + x)
-Transducers.combine(::typeof(averaging), (n1, s1), (n2, s2)) = (n1 + n2, s1 + s2)
-Transducers.complete(::typeof(averaging), (n, s)) = s / n
-Transducers.Completing(::typeof(averaging)) = averaging  # TODO: remove this
-InitialValues.@def averaging (1, x)
+averaging
+
+struct AverageState{Sum}
+    sum::Sum
+    count::Int
+end
+
+@inline singleton_average(x) = AverageState(x, 1)
+
+@inline merge_state(a::AverageState, b::AverageState) =
+    AverageState(a.sum + b.sum, a.count + b.count)
+InitialValues.@def_monoid merge_state
+
+@inline Transducers.complete(::typeof(merge_state), a::AverageState) = a.sum / a.count
+Transducers.Completing(::typeof(merge_state)) = merge_state  # TODO: remove this
+
+const averaging = reducingfunction(Map(singleton_average), merge_state)

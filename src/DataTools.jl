@@ -5,7 +5,7 @@ export averaging, inc1, modifying, oncol
 using InitialValues: InitialValues
 using Setfield: @lens, Lens, PropertyLens, modify, set
 using Tables: Tables
-using Transducers: Transducers, complete, next, start
+using Transducers: Map, Transducers, combine, complete, next, reducingfunction, start
 
 include("utils.jl")
 include("oncol.jl")
