@@ -59,8 +59,9 @@ jobs:
 
           git ls-tree -r --name-only "origin/$base" | grep -F Manifest.toml \
               | xargs git checkout "origin/$base" --
-          git ls-tree -r --name-only "origin/$base" | grep -F Manifest.toml \
-              | xargs git add -f --
+
+      - run: git status
+      - run: git diff
 
       # https://github.com/tkf/julia-update-manifests
       - name: Update */Manifest.toml
@@ -68,6 +69,9 @@ jobs:
         with:
           version: '1.4'
           projects: test/environments/main
+
+      - run: git status
+      - run: git diff
 
       # https://github.com/peter-evans/create-pull-request
       # https://github.com/marketplace/actions/create-pull-request
