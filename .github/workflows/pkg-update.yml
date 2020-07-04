@@ -59,9 +59,11 @@ jobs:
 
           git ls-tree -r --name-only "origin/$base" | grep -F Manifest.toml \
               | xargs git checkout "origin/$base" --
+          git ls-tree -r --name-only "origin/$base" | grep -F Manifest.toml \
+              | xargs git add -f --
 
       - run: git status
-      - run: git diff
+      - run: git diff --cached
 
       # https://github.com/tkf/julia-update-manifests
       - name: Update */Manifest.toml
