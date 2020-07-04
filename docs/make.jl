@@ -14,6 +14,7 @@ makedocs(;
     pages=[
         "Home" => "index.md",
     ],
+    strict = get(ENV, "CI", "false") == "true",
 )
 
 deploydocs(;
