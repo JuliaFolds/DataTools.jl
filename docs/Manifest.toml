@@ -41,7 +41,7 @@ version = "1.3.0"
 deps = ["InitialValues", "Setfield", "Tables", "Transducers"]
 path = ".."
 uuid = "96c8136d-373b-4a4f-9482-8552faa6eb26"
-version = "0.1.0"
+version = "0.1.1-DEV"
 
 [[DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -210,7 +210,7 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Transducers]]
 deps = ["ArgCheck", "BangBang", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "Requires", "Setfield", "SplittablesBase", "Tables"]
-git-tree-sha1 = "ab143f9537fdd03a8ac79e6633a0eb314dae0485"
+git-tree-sha1 = "9b108ee42de9b86368017820385ab67ac0dc87ab"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaFolds/Transducers.jl.git"
 uuid = "28d57a85-8fef-5791-bfe6-a80928e7c999"
