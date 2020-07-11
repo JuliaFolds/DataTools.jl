@@ -1,6 +1,6 @@
 module DataTools
 
-export averaging, inc1, modifying, oncol
+export averaging, inc1, modifying, oncol, rightif
 
 using InitialValues: InitialValues
 using Setfield: @lens, Lens, PropertyLens, modify, set
