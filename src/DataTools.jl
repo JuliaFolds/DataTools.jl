@@ -1,9 +1,11 @@
 module DataTools
 
-export averaging, inc1, modifying, oncol, rightif
+export averaging, inc1, meanvar, modifying, oncol, rightif
 
 using InitialValues: InitialValues
 using Setfield: @lens, Lens, PropertyLens, modify, set
+using StaticNumbers: static
+using Statistics: Statistics, mean, var
 using Tables: Tables
 using Transducers: Map, Transducers, combine, complete, next, reducingfunction, start
 

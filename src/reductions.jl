@@ -32,6 +32,18 @@ Transducers.start(::typeof(inc1), ::InitializerFor{typeof(inc1)}) = 0
 Transducers.combine(::typeof(inc1), a, b) = a + b
 InitialValues.@def inc1 1
 
+function merge_state end
+Transducers.Completing(::typeof(merge_state)) = merge_state  # TODO: remove this
+
+@inline initialize_state(x) = x
+@inline initialize_right(x) = initialize_state(x)
+@inline initialize_left(x) = initialize_state(x)
+
+const InitMergeState = InitialValues.GenericInitialValue{typeof(merge_state)}
+merge_state(::InitMergeState, x) = initialize_right(x)
+merge_state(x, ::InitMergeState) = initialize_left(x)
+merge_state(x::InitMergeState, ::InitMergeState) = x
+InitialValues.hasinitialvalue(::Type{typeof(merge_state)}) = true
 
 """
     averaging
@@ -63,12 +75,65 @@ end
 
 @inline merge_state(a::AverageState, b::AverageState) =
     AverageState(a.sum + b.sum, a.count + b.count)
-InitialValues.@def_monoid merge_state
 
 @inline Transducers.complete(::typeof(merge_state), a::AverageState) = a.sum / a.count
-Transducers.Completing(::typeof(merge_state)) = merge_state  # TODO: remove this
 
 const averaging = reducingfunction(Map(singleton_average), merge_state)
+
+"""
+    meanvar
+
+A reducing function for computing the mean and variance.
+
+# Examples
+```jldoctest
+julia> using DataTools, Transducers
+
+julia> foldl(meanvar, Filter(isodd), 1:10)
+(5.0, 10.0)
+
+julia> rf = oncol(a = meanvar, b = meanvar);
+
+julia> foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
+(a = (1.5, 0.5), b = (2.5, 0.5))
+```
+"""
+meanvar
+
+struct MeanVarState{Count,Mean,M2}
+    count::Count
+    mean::Mean
+    m2::M2
+end
+
+@inline singleton_meanvar(x) = MeanVarState(static(1), x, static(0))
+
+# Optimization for avoiding type-changing accumulator
+@inline function initialize_state(a::MeanVarState)
+    count, ione = promote(a.count, 1)
+    mean = float(a.mean)
+    m2, = promote(a.m2, (one(mean) * one(mean) + one(a.m2)) / (ione + ione))
+    return MeanVarState(count, mean, m2)
+end
+
+@inline function merge_state(a::MeanVarState, b::MeanVarState)
+    d = b.mean - a.mean
+    count = a.count + b.count
+    return MeanVarState(
+        a.count + b.count,
+        a.mean + d * b.count / count,
+        a.m2 + b.m2 + d^2 * a.count * b.count / count,
+    )
+end
+
+@inline Transducers.complete(::typeof(merge_state), a::MeanVarState) = (mean(a), var(a))
+
+Statistics.mean(a::MeanVarState) = a.mean
+Statistics.var(a::MeanVarState; corrected::Bool = true) =
+    a.m2 / (corrected ? (a.count - 1) : a.count)
+Statistics.std(a::MeanVarState; kw...) = sqrt(var(a; kw...))
+
+const meanvar = reducingfunction(Map(singleton_meanvar), merge_state)
 
 """
     rightif(predicate, [focus = identity]) -> op::Function
