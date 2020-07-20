@@ -107,15 +107,15 @@ julia> acc.count
 julia> m, v, c = acc;  # destructuring works
 
 julia> Tuple(acc)  # (mean, var, count)
-(5.0, 10.0, 5)
+(48.0, 784.0, 48)
 
 julia> NamedTuple(acc)
-(mean = 5.0, var = 10.0, count = 5)
+(mean = 48.0, var = 784.0, count = 48)
 
 julia> rf = oncol(a = meanvar, b = meanvar);
 
 julia> foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
-(a = MeanVarState(mean=1.5, var=0.5, count=2), b=MeanVarState(mean=2.5, var=0.5, count=2))
+(a = MeanVarState(mean=1.5, var=0.5, count=2), b = MeanVarState(mean=2.5, var=0.5, count=2))
 ```
 """
 meanvar
