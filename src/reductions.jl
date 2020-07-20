@@ -87,15 +87,35 @@ A reducing function for computing the mean and variance.
 
 # Examples
 ```jldoctest
-julia> using DataTools, Transducers
+julia> using DataTools, Transducers, Statistics
 
-julia> foldl(meanvar, Filter(isodd), 1:10)
-(5.0, 10.0)
+julia> acc = foldl(meanvar, Filter(isodd), 1:96)
+MeanVarState(mean=48.0, var=784.0, count=48)
+
+julia> acc.mean, mean(acc)
+(48.0, 48.0)
+
+julia> acc.var, var(acc), var(acc, corrected = false)
+(784.0, 784.0, 767.6666666666666)
+
+julia> acc.std, std(acc)
+(28.0, 28.0)
+
+julia> acc.count
+48
+
+julia> m, v, c = acc;  # destructuring works
+
+julia> Tuple(acc)  # (mean, var, count)
+(5.0, 10.0, 5)
+
+julia> NamedTuple(acc)
+(mean = 5.0, var = 10.0, count = 5)
 
 julia> rf = oncol(a = meanvar, b = meanvar);
 
 julia> foldl(rf, Map(identity), [(a = 1, b = 2), (a = 2, b = 3)])
-(a = (1.5, 0.5), b = (2.5, 0.5))
+(a = MeanVarState(mean=1.5, var=0.5, count=2), b=MeanVarState(mean=2.5, var=0.5, count=2))
 ```
 """
 meanvar
@@ -126,7 +146,7 @@ end
     )
 end
 
-@inline Transducers.complete(::typeof(merge_state), a::MeanVarState) = (mean(a), var(a))
+@inline Transducers.complete(::typeof(merge_state), a::MeanVarState) = a
 
 Statistics.mean(a::MeanVarState) = a.mean
 Statistics.var(a::MeanVarState; corrected::Bool = true) =
@@ -134,6 +154,64 @@ Statistics.var(a::MeanVarState; corrected::Bool = true) =
 Statistics.std(a::MeanVarState; kw...) = sqrt(var(a; kw...))
 
 const meanvar = reducingfunction(Map(singleton_meanvar), merge_state)
+
+Base.propertynames(::MeanVarState) = (:mean, :var, :count)
+Base.propertynames(::MeanVarState, private) =
+    private ? (:mean, :var, :count, :m2, :std) : (:mean, :var, :count)
+
+@inline function Base.getproperty(a::MeanVarState, name::Symbol)
+    if name === :count
+        return getfield(a, :count)
+    elseif name === :mean
+        return getfield(a, :mean)
+    elseif name === :m2
+        return getfield(a, :m2)
+    elseif name === :var
+        return var(a)
+    elseif name === :std
+        return std(a)
+    else
+        throw(KeyError(name))
+    end
+end
+
+Base.IteratorEltype(::Type{<:MeanVarState}) = Base.EltypeUnknown()
+Base.IteratorSize(::Type{<:MeanVarState}) = Base.HasLength()
+Base.length(::MeanVarState) = 3
+Base.iterate(a::MeanVarState) = (mean(a), Val(2))
+Base.iterate(a::MeanVarState, ::Val{2}) = (var(a), Val(3))
+Base.iterate(a::MeanVarState, ::Val{3}) = (a.count, Val(4))
+Base.iterate(a::MeanVarState, ::Val{4}) = nothing
+
+Base.NamedTuple(a::MeanVarState) = (mean = mean(a), var = var(a), count = a.count)
+
+function Base.show(io::IO, a::MeanVarState)
+    if get(io, :limit, false) !== true
+        print(io, @__MODULE__, '.')
+    end
+    if a === MeanVarState(a.count, a.mean, a.m2)
+        print(io, "MeanVarState")
+    else
+        print(IOContext(io, :module => @__MODULE__), typeof(a))
+    end
+    print(io, '(')
+    print(io, "mean=", mean(a))
+    print(io, ", var=", var(a))
+    print(io, ", count=", a.count)
+    if get(io, :limit, false) !== true
+        print(io, ", m2=", a.m2)
+    end
+    print(io, ')')
+end
+
+# Constructor to be compatible with the `repr` (and for testing)
+function (::Type{T})(; count, mean, m2 = nothing, var = nothing) where {T<:MeanVarState}
+    m2 === nothing && var === nothing && throw(ArgumentError("`m2` or `var` required"))
+    if m2 === nothing
+        m2 = var * (count - 1)
+    end
+    return T(count, mean, m2)
+end
 
 """
     rightif(predicate, [focus = identity]) -> op::Function
