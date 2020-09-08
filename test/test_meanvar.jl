@@ -6,6 +6,8 @@ using Statistics
 using Test
 using Transducers: Filter, Map, TeeRF
 
+include("utils.jl")
+
 reduce_bs1(args...; kw...) = reduce(args...; basesize = 1, kw...)
 
 @testset for fold in [foldl, reduce_bs1, reduce]
@@ -70,9 +72,9 @@ end
     @testset "non-default type parameters" begin
         s = MeanVarState{Any,Any,Any}(mean = 8.0, var = 24.0, count = 8)
         str = sprint(show, s; context = :limit => true)
-        @test str == "MeanVarState{Any,Any,Any}(mean=8.0, var=24.0, count=8)"
+        @test str ==ᵣ "MeanVarState{Any,Any,Any}(mean=8.0, var=24.0, count=8)"
         str = sprint(show, s; context = :limit => false)
-        @test str ==
+        @test str ==ᵣ
               "DataTools.MeanVarState{Any,Any,Any}(mean=8.0, var=24.0, count=8, m2=168.0)"
     end
 end
