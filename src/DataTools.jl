@@ -14,7 +14,7 @@ export averaging,
 
 using Base: HasLength, HasShape, IteratorSize
 using InitialValues: InitialValues
-using Setfield: @lens, Lens, PropertyLens, modify, set
+using Accessors: @optic, PropertyLens, modify, set
 using StaticNumbers: static
 using Statistics: Statistics, mean, std, var
 using Tables: Tables
