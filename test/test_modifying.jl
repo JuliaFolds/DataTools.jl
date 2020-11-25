@@ -1,7 +1,7 @@
 module TestModifying
 
 using DataTools
-using Setfield: @lens
+using Accessors: @optic
 using Test
 using Transducers
 
@@ -16,7 +16,7 @@ end
     @test map(modifying(a = string), [(a = 1, b = 2), (a = 3, b = 4)]) ==
           [(a = "1", b = 2), (a = "3", b = 4)]
     @test map(
-        modifying(@lens(_.a[1].b) => x -> 10x),
+        modifying(@optic(_.a[1].b) => x -> 10x),
         [(a = ((b = 1,), 2),), (a = ((b = 3,), 4),)],
     ) == [(a = ((b = 10,), 2),), (a = ((b = 30,), 4),)]
 end

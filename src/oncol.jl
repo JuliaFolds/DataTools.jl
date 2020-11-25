@@ -129,9 +129,9 @@ Transducers.combine(rf::OnRowFunction, a, b) =
 
 # TODO: define better API:
 Transducers._asmonoid(rf::OnRowFunction) =
-    OnRowFunction(map(modifying(@lens(_[2]) => Transducers._asmonoid), rf.functions))
+    OnRowFunction(map(modifying(@optic(_[2]) => Transducers._asmonoid), rf.functions))
 Transducers.Completing(rf::OnRowFunction) =
-    OnRowFunction(map(modifying(@lens(_[2]) => Transducers.Completing), rf.functions))
+    OnRowFunction(map(modifying(@optic(_[2]) => Transducers.Completing), rf.functions))
 
 @inline process_spec_kwargs((iname, spec)::Pair) =
     process_spec(Property(iname), spec, Property(iname))
