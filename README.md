@@ -24,11 +24,11 @@ julia> map(modifying(a = string), data)
 julia> reduce(modifying(a = +), data)
 (a = 6, b = 7)
 
-julia> using Setfield: @lens
+julia> using Accessors: @optic
 
 julia> data = [(a = ((b = 1,), 2),), (a = ((b = 3,), 4),)];
 
-julia> map(modifying(@lens(_.a[1].b) => x -> 10x), data)
+julia> map(modifying(@optic(_.a[1].b) => x -> 10x), data)
 2-element Array{NamedTuple{(:a,),Tuple{Tuple{NamedTuple{(:b,),Tuple{Int64}},Int64}}},1}:
  (a = ((b = 10,), 2),)
  (a = ((b = 30,), 4),)
