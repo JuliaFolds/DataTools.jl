@@ -2,9 +2,9 @@
 
 [[Accessors]]
 deps = ["Compat", "CompositionsBase", "ConstructionBase", "Future", "MacroTools", "Requires", "Test"]
-git-tree-sha1 = "d04ec229e5edfa9dae2bb5bda761a180315f7a86"
+git-tree-sha1 = "6061581e28cf6fbbb6af983022c2589cbc801007"
 uuid = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
-version = "0.1.0"
+version = "0.1.1"
 
 [[ArgCheck]]
 git-tree-sha1 = "dedbbb2ddb876f899585c4ec4433265e3017215a"
