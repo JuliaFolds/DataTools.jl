@@ -1,3 +1,9 @@
+@static if VERSION < v"1.8.0-DEV.410"
+    using Base: @_inline_meta
+else
+    const var"@_inline_meta" = Base.var"@inline"
+end
+
 const RowLike = Union{NamedTuple,Tables.Row,Tables.AbstractRow}
 
 if isdefined(Base, :ComposedFunction) # Julia >= 1.6.0-DEV.85
