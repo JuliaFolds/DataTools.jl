@@ -63,15 +63,15 @@ end
 
 @inline (f::ModifyingFunction)(x) =
     foldl(f.functions; init = x) do x, (lens, g)
-        Base.@_inline_meta
+        @_inline_meta
         modify(g, x, lens)
     end
 
 @inline (f::ModifyingFunction)(x, y) =
     foldl(f.functions; init = x) do z, (lens, g)
-        Base.@_inline_meta
+        @_inline_meta
         modify(z, lens) do v
-            Base.@_inline_meta
+            @_inline_meta
             g(v, lens(y))
         end
     end

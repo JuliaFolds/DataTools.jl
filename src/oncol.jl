@@ -95,14 +95,14 @@ end
 
 @inline (f::OnRowFunction)(x) =
     mapfoldl(merge, f.functions; init = NamedTuple()) do (iname, g, oname)
-        Base.@_inline_meta
+        @_inline_meta
         (; Symbol(oname) => g(getprop(x, iname)))
     end
 
 @inline (rf::OnRowFunction)(acc, x) = next(rf, acc, x)
 @inline Transducers.next(rf::OnRowFunction, acc, x) =
     mapfoldl(merge, rf.functions; init = NamedTuple()) do (iname, op, oname)
-        Base.@_inline_meta
+        @_inline_meta
         (; Symbol(oname) => next(op, getprop(acc, oname), getprop(x, iname)))
     end
 
