@@ -7,9 +7,9 @@ version = "0.0.1"
 
 [[Accessors]]
 deps = ["Compat", "CompositionsBase", "ConstructionBase", "Dates", "InverseFunctions", "LinearAlgebra", "MacroTools", "Requires", "StaticArrays", "Test"]
-git-tree-sha1 = "c7dddee3f32ceac12abd9a21cd0c4cb489f230d2"
+git-tree-sha1 = "a4f8669e46c8cdf68661fe6bb0f7b89f51dd23cf"
 uuid = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
-version = "0.1.29"
+version = "0.1.30"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
@@ -57,9 +57,9 @@ version = "0.1.1"
 
 [[ConstructionBase]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "89a9db8d28102b094992472d333674bd1a83ce2a"
+git-tree-sha1 = "738fec4d684a9a6ee9598a8bfee305b26831f28c"
 uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-version = "1.5.1"
+version = "1.5.2"
 
 [[DataAPI]]
 git-tree-sha1 = "e8119c1a33d267e16108be441a287a6981ba1630"
